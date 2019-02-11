@@ -1,0 +1,7 @@
+* Implementation notes
+
+** XLSX handling
+Rather than using custom script to handle xlsx files, I am using libreoffice.
+#+BEGIN_SRC sh
+  libreoffice --headless --convert-to csv filename.xlsx
+#+END_SRC

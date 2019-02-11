@@ -1,0 +1,10 @@
+lib/sbi_xls.pm
+Makefile.PL
+MANIFEST			This list of files
+readme.org
+resources/sample_info.dat
+resources/sample_info.json
+resources/sample_xls.dat
+t/00parsing.t
+t/01validation.t
+t/02reporting.t

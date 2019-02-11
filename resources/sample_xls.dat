@@ -1,0 +1,21 @@
+Account Name :	Mr. John Q Doe
+Address :    add-field-1
+	     add-field-2
+	     add-field-3
+	     add-field-4
+Date : 	     01 10 2018
+Account Number :	01234567890123456
+Account Description :	SBCHQ-GEN-PUB-IND-RURAL-INR
+Branch :		NewDelhi
+Drawing Power :		0.00
+Interest Rate(% p.a.) : 3.5
+MOD Balance :	      0.00
+CIF No. :  	      01234567890
+IFS Code :	      01230123456
+MICR Code : 	      012345678
+Nomination Registered :	True
+Balance on :	      0
+Start Date :	      01 10 2018
+End Date : 	      01 10 2018
+Txn Date Value Date   Description	Ref No.	Debit	Credit	Balance
+DD MM YYYY     DD MM YYYY		A Sample Description of Transaction	A Sample Reference Number	TxnDebit	TxnCredit	TxnBalance

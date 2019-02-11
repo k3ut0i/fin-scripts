@@ -1,0 +1,10 @@
+* Analysis Tools for personal budgeting and record keeping.
+This project is a collection of tools to keep track of my personal finances.
+
+** External dependencies
+- ledger3.
+- perl, The project is mostly written in perl language.
+
+** SBI Banking Information
+- IFS Code, MICR support? During initial stages this ! data can be used to verify codes.
+This https://www.rbi.org.in/scripts/neft.aspx link has a list of IFS Codes for NEFT enabled banks.
