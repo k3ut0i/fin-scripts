@@ -141,39 +141,34 @@ sub burp_end_date{$_[0]->stringify()};
 
 # Check if transaction header parses correctly
 sub slurp_txn_header{
-  <$_[0]>;
+  croak "" unless defined $_[0];
+  defined (my $txn_header = readline $_[0]) or carp "Cant read txn_headerb";
+  return $txn_header;
 }
 
 sub burp_txn_header{
-  join("\t", TXN_HEADER);
+  join("\t", TXN_HEADER());
 }
 
-# FIXME: 
-sub validate_info_header{
-  my ($info_file , $statement_file) = @_;
-  open(my $info_fh, '<', $info_file) or die "Can't open file < $info_file : $!";
-  open(my $statement_fh, '<', $statement_file) or
-    die "Can't open file < $statement_file : $!";
-  foreach (TXN_HEADER) {
-    my $line = <$statement_fh>;
-    my ($info_name, $info) = split(/:/, $line);
-    #    next if ($info =~ <$info_fh>);
-    #    die "Cannot validate info.";
-    print "INFO: <$info_fh> , STATEMENT $info\n";
-  }
-}
-# TODO: 
-sub slurp_txns{
-  my $inp_file_name = shift;
-  open my $inp_fh, "<", $inp_file_name or
-    die "Can't open < $inp_file_name : $!";
+sub slurp_txn_field{
+  my $txn_line;
+  if (defined ($txn_line = readline $_[0])) {
+    my ($txn_date, $value_date, $desc, $ref, $debit, $credit, $balance)
+      = split '\t', $txn_line;
 
-  while (<$inp_fh>) {
-    print join('|-|', split(/\t/));
+
+    my %txn;
+    @txn{TXN_HEADER()} = (dd_mm_yyyy_to_datetime($txn_date),
+			  dd_mm_yyyy_to_datetime($value_date),
+			  $desc,
+			  $ref,
+			  $debit,
+			  $credit,
+			  $balance);
+    return %txn;
   }
 }
 
-# TODO:
 sub sanitize_txn_fields{}
 
 # For each field we have a parser(slurp) and printer(burp)
