@@ -153,11 +153,13 @@ sub burp_txn_header{
 sub slurp_txn_field{
   my $txn_line;
   if (defined ($txn_line = readline $_[0])) {
+    my @fields = split '\t', $txn_line;
+    carp "Number of fields required is 7 got : " . scalar @fields
+      unless @fields == 7;
     my ($txn_date, $value_date, $desc, $ref, $debit, $credit, $balance)
-      = split '\t', $txn_line;
-
-
+      = @fields;
     my %txn;
+    # TODO: Any sanitization to be done on reference nos. and descriptions ??
     @txn{TXN_HEADER()} = (dd_mm_yyyy_to_datetime($txn_date),
 			  dd_mm_yyyy_to_datetime($value_date),
 			  $desc,
@@ -165,7 +167,9 @@ sub slurp_txn_field{
 			  $debit,
 			  $credit,
 			  $balance);
-    return %txn;
+    return \%txn;
+  } else {
+    return undef;
   }
 }
 
@@ -193,9 +197,7 @@ my %handlers =
   );
 
 sub get_personal_info{
-  my $xls_file = shift;
-  open (my $xls, '<', $xls_file) or
-    croak "Can not open $xls_file for reading.";
+  my $xls = shift;
   my $personal_info;
   $personal_info =
     {
@@ -225,7 +227,9 @@ sub write_personal_info{};
 ## Tests if the given data file is the one we want.
 sub validate_input{
   (my $input_data_file, my $personal_file) = @_;
-  my $xls_info = get_personal_info($input_data_file);
+  open(my $inp_fh, '<', $input_data_file) or
+    croak "Can't open $input_data_file for reading. $!";
+  my $xls_info = get_personal_info($inp_fh);
   my $saved_json_info = decode_json read_file $personal_file;
   # TODO: Compare the two hashes and verify if equal.
   # This function to all is very convoluted. It started

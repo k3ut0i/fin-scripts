@@ -107,7 +107,7 @@ my $txn = join '\s+', SBI::XLS::TXN_HEADER();
 like(SBI::XLS::slurp_txn_header($xls_fh), qr/$txn/, 'Transaction Header');
 
 subtest 'Transaction Field' => sub{
-  my %txn = SBI::XLS::slurp_txn_field($xls_fh);
+  my %txn = %{SBI::XLS::slurp_txn_field($xls_fh)};
   isa_ok($txn{'Txn Date'}, 'DateTime');
   isa_ok($txn{'Value Date'}, 'DateTime');
   ok(looks_like_number($txn{'Debit'}), 'Debit looks like a number');
