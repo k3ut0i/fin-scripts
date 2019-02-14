@@ -8,7 +8,7 @@ use Test::More;
 
 use Scalar::Util qw(looks_like_number);
 
-BEGIN:{use_ok("sbi_xls")};
+BEGIN:{use_ok("SBI::XLS")};
 
 my $sbi_xls_file = "resources/sample_xls.dat";
 my $personal_info_file = "resources/sample_info.dat";
@@ -35,7 +35,7 @@ subtest 'PERSONAL Info file' => sub{
 
 subtest 'Account Name' => sub{
   chomp(my $account_name = <$info_fh>);
-  is(slurp_account_name($xls_fh), $account_name);
+  is(SBI::XLS::slurp_account_name($xls_fh), $account_name);
 };
 
 
@@ -46,67 +46,70 @@ subtest 'Address' => sub{
     chomp(my $line = <$info_fh>);
     $address .= ", " . $line;
   }
-  is(slurp_address($xls_fh), $address);
+  is(SBI::XLS::slurp_address($xls_fh), $address);
 };
 
 subtest 'Date' => sub{
   <$info_fh>; # Ignore value.
-  ok(slurp_date($xls_fh)->isa('DateTime'));
+  ok(SBI::XLS::slurp_date($xls_fh)->isa('DateTime'));
 };
 
 <$info_fh> ; #Ignore Value.
-ok(looks_like_number(slurp_account_number($xls_fh)), "Account Number");
+ok(looks_like_number(SBI::XLS::slurp_account_number($xls_fh)), "Account Number");
 
 subtest 'Account Desc' => sub{
   chomp(my $desc = <$info_fh>);
-  is(slurp_account_description($xls_fh), $desc, "Account description match");
+  is(SBI::XLS::slurp_account_description($xls_fh), $desc, "Account description match");
 };
 
 
 subtest 'Branch' => sub{
   chomp(my $branch = <$info_fh>);
-  is(slurp_branch($xls_fh), $branch, 'Branch Name');
+  is(SBI::XLS::slurp_branch($xls_fh), $branch, 'Branch Name');
 };
 
 chomp(my $drawing_power = <$info_fh>);
-is(slurp_drawing_power($xls_fh), $drawing_power, 'Drawing Power');
+is(SBI::XLS::slurp_drawing_power($xls_fh), $drawing_power, 'Drawing Power');
 
 chomp(my $interest_rate = <$info_fh>);
-is(slurp_interest_rate($xls_fh), $interest_rate, 'Interest Rate');
+is(SBI::XLS::slurp_interest_rate($xls_fh), $interest_rate, 'Interest Rate');
 
 chomp(my $mod_balance = <$info_fh>);
-is(slurp_mod_balance($xls_fh), $mod_balance, 'MOD Balance');
+is(SBI::XLS::slurp_mod_balance($xls_fh), $mod_balance, 'MOD Balance');
 
 chomp(my $cif_no = <$info_fh>);
-is(slurp_cif_no($xls_fh), $cif_no, 'CIF No.');
+is(SBI::XLS::slurp_cif_no($xls_fh), $cif_no, 'CIF No.');
 
 chomp(my $ifs_code = <$info_fh>);
-my $ifs_hash = slurp_ifs_code($xls_fh);
+my $ifs_hash = SBI::XLS::slurp_ifs_code($xls_fh);
 my $ifs_code_from_xls = $ifs_hash->{Bank} . '0' . $ifs_hash->{Branch};
 is($ifs_code_from_xls, $ifs_code, 'IFS Code.');
 
 chomp(my $micr_code = <$info_fh>);
-is(slurp_micr_code($xls_fh), $micr_code, 'MICR Code');
+is(SBI::XLS::slurp_micr_code($xls_fh), $micr_code, 'MICR Code');
 
 chomp(my $nomination_status = <$info_fh>);
-is(slurp_nomination_status($xls_fh), $nomination_status, 'Nomination Status');
+is(SBI::XLS::slurp_nomination_status($xls_fh), $nomination_status, 'Nomination Status');
 
 chomp(my $current_balance = <$info_fh>);
-is(slurp_balance_on($xls_fh), $current_balance, 'Balance on date.');
+is(SBI::XLS::slurp_balance_on($xls_fh), $current_balance, 'Balance on date.');
 
 subtest 'Start Date' => sub{
   <$info_fh>;
-  ok(slurp_start_date($xls_fh)->isa('DateTime'));
+  ok(SBI::XLS::slurp_start_date($xls_fh)->isa('DateTime'));
 };
 
 subtest 'End Date' => sub{
   <$info_fh>;
-  ok(slurp_end_date($xls_fh)->isa('DateTime'));
+  ok(SBI::XLS::slurp_end_date($xls_fh)->isa('DateTime'));
 };
+
+#like(SBI::XLS::slurp_txn_header($xls_fh), qr/SBI::XLS::$txn_header/, 'Transaction Header');
 
 
 Todo :{
   local $TODO = "Un implemented features";
+
 
 };
 # TODO Continue writing tests for rest of the INFO_HEADER fields

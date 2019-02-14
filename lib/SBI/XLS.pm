@@ -1,14 +1,18 @@
 #!/usr/bin/perl
 # SBI exports the file as XLS spreadsheet but it's just a text file.
 # This script is to convert the file into a more suitable format.
-
+package SBI::XLS;
 use strict;
 use warnings;
 use Carp qw(carp croak);
 use DateTime;
 use List::Util qw(all);
+use JSON;
+use File::Slurp qw(read_file);
+
 use constant TXN_HEADER => ("Txn Date", "Value Date", "Description",
 			    "Ref No./Cheque No.", "Debit", "Credit", "Balance");
+our $txn_header = join "\t", TXN_HEADER;
 
 # FIXME: Should i replace these with acutal names? or Just these keys useful?
 use constant INFO_HEADER => ("Account Name", "Address", "Date", "Account Number",
@@ -135,6 +139,15 @@ sub slurp_end_date{
 }
 sub burp_end_date{$_[0]->stringify()};
 
+# Check if transaction header parses correctly
+sub slurp_txn_header{
+  <$_[0]>;
+}
+
+sub burp_txn_header{
+  join("\t", TXN_HEADER);
+}
+
 # FIXME: 
 sub validate_info_header{
   my ($info_file , $statement_file) = @_;
@@ -159,6 +172,7 @@ sub slurp_txns{
     print join('|-|', split(/\t/));
   }
 }
+
 # TODO:
 sub sanitize_txn_fields{}
 
@@ -219,6 +233,9 @@ sub validate_input{
   my $xls_info = get_personal_info($input_data_file);
   my $saved_json_info = decode_json read_file $personal_file;
   # TODO: Compare the two hashes and verify if equal.
+  # This function to all is very convoluted. It started
+  # as a simple predicate to check validitiy for each key
+  # but just ran out of control.
   all {
     my $equality = 0;
     if (ref $xls_info->{$_} eq 'DateTime') {

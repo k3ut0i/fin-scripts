@@ -17,5 +17,5 @@ Nomination Registered :	True
 Balance on :	      0
 Start Date :	      01 10 2018
 End Date : 	      01 10 2018
-Txn Date Value Date   Description	Ref No.	Debit	Credit	Balance
-DD MM YYYY     DD MM YYYY		A Sample Description of Transaction	A Sample Reference Number	TxnDebit	TxnCredit	TxnBalance
+Txn Date	Value Date	Description	Ref No.	Debit	Credit	Balance
+DD MM YYYY	DD MM YYYY	A Sample Description of Transaction	A Sample Reference Number	TxnDebit	TxnCredit	TxnBalance
