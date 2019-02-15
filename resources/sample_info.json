@@ -4,7 +4,7 @@
 	       "add-field-2",
 	       "add-field-3",
 	       "add-field-4"],
-  "Date" : "01 08 2018",
+  "Date" : "01 Aug 2018",
   "Account Number" : "01234567890123456",
   "Account Description" : "SBCHQ-GEN-PUB-IND-RURAL-INR",
   "Branch" : "NewDelhi",
@@ -16,6 +16,6 @@
   "MICR Code" : "012345678",
   "Nomination Registered" : "True",
   "Balance on" : 0,
-  "Start Date" : "01 08 2018",
-  "End Date" : "01 08 2018"
+  "Start Date" : "01 Aug 2018",
+  "End Date" : "01 Aug 2018"
 }

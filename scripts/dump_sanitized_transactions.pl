@@ -14,14 +14,15 @@ sub dump_txns_from_file{
   my $txn_header = SBI::XLS::slurp_txn_header($fh);
   my @txns;
   while (defined( my $txn = SBI::XLS::slurp_txn_field($fh))) {
-    # What's wrong here? Debugg goes haywire here.
-    my @txn_fields = values %{$txn};
+
+    my @txn_fields = @{$txn}{SBI::XLS::TXN_HEADER()};
     push @txns,  \@txn_fields;
   }
   my @header = SBI::XLS::TXN_HEADER;
   my $table = Term::Table->new(
 			       header => \@header,
 			       rows => \@txns,
+			       allow_overflow => 1,
 			      );
   print "$_\n" for $table->render;
 };

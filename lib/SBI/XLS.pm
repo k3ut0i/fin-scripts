@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use Carp qw(carp croak);
 use DateTime;
+use DateTime::Format::Strptime;
 use List::Util qw(all);
 use JSON;
 use File::Slurp qw(read_file);
@@ -29,9 +30,9 @@ sub trim{
 
 # TODO: Replace this with datetime formatters for strptime.
 sub dd_mm_yyyy_to_datetime{
-  # TODO: Handle Multiple versions of dd-mm-yyyy format
-  my ($day, $month, $year) = split / /, $_[0];
-  DateTime->new (year => $year, month => $month, day => $day);
+  my $strp = DateTime::Format::Strptime->new(pattern => '%d %b %Y',
+					     on_error => 'croak');
+  $strp->parse_datetime($_[0]);
 }
 
 sub slurp_generic{
@@ -71,7 +72,14 @@ sub burp_date{
   my $date_obj = shift;
   return $date_obj->stringify();
 }
-sub slurp_account_number{ slurp_generic $_[0], (INFO_HEADER)[3];}
+sub slurp_account_number{
+  my $acc_string = slurp_generic $_[0], (INFO_HEADER)[3];
+  if ( $acc_string =~ /_*(\d+)/) {
+    return $1;
+  }else {
+    return undef;
+  }
+}
 sub burp_account_number{burp_generic $_[0]};
 
 sub slurp_account_description{ slurp_generic $_[0], (INFO_HEADER)[4];}
@@ -90,10 +98,16 @@ sub slurp_mod_balance{ slurp_generic $_[0], (INFO_HEADER)[8];}
 sub burp_mod_balance{burp_generic $_[0]};
 
 sub slurp_cif_no{
-  my $code = slurp_generic $_[0], (INFO_HEADER)[9];
-  carp "CIF number is not 11 characters" if length $code != 11;
-  return $code;
+  my $code_string = slurp_generic $_[0], (INFO_HEADER)[9];
+  if ($code_string =~ /_*(\d+)/) {
+    my $code = $1;
+    carp "CIF number is not 11 characters" if length $code != 11;
+    return $code;
+  }else {
+    return undef;
+  }
 }
+
 sub burp_cif_no{burp_generic $_[0]};
 
 sub slurp_ifs_code{
@@ -113,10 +127,15 @@ sub burp_ifs_code{
 };
 
 sub slurp_micr_code{
-  my $code = slurp_generic $_[0], (INFO_HEADER)[11];
-  carp "MICR Code is ". length $code . " not 9 characters"
-    if length $code != 9;
-  return $code;
+  my $code_string = slurp_generic $_[0], (INFO_HEADER)[11];
+  if ($code_string =~ /_*(\d+)/) {
+    my $code = $1;
+    carp "MICR Code is ". length $code . " not 9 characters"
+      if length $code != 9;
+    return $code;
+  }else {
+    return undef;
+  }
 }
 sub burp_micr_code{burp_generic $_[0]};
 
@@ -154,8 +173,7 @@ sub slurp_txn_field{
   my $txn_line;
   if (defined ($txn_line = readline $_[0])) {
     my @fields = split '\t', $txn_line;
-    carp "Number of fields required is 7 got : " . scalar @fields
-      unless @fields == 7;
+    return undef unless @fields == 7;
     my ($txn_date, $value_date, $desc, $ref, $debit, $credit, $balance)
       = @fields;
     my %txn;
