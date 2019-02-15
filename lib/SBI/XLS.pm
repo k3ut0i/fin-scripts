@@ -162,6 +162,7 @@ sub burp_end_date{$_[0]->stringify()};
 sub slurp_txn_header{
   croak "" unless defined $_[0];
   defined (my $txn_header = readline $_[0]) or carp "Cant read txn_headerb";
+  chomp($txn_header);
   return $txn_header;
 }
 
@@ -172,6 +173,7 @@ sub burp_txn_header{
 sub slurp_txn_field{
   my $txn_line;
   if (defined ($txn_line = readline $_[0])) {
+    chomp($txn_line);
     my @fields = split '\t', $txn_line;
     return undef unless @fields == 7;
     my ($txn_date, $value_date, $desc, $ref, $debit, $credit, $balance)
