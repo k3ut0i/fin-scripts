@@ -170,6 +170,16 @@ sub burp_txn_header{
   join("\t", TXN_HEADER());
 }
 
+sub sanitize_number{
+  my $num = shift;
+  if ($num =~ /\s/) {
+    $num = 0.0;
+  }
+  else {
+    $num =~ s/,//g;
+  }
+  return $num;
+}
 sub slurp_txn_field{
   my $txn_line;
   if (defined ($txn_line = readline $_[0])) {
@@ -184,9 +194,9 @@ sub slurp_txn_field{
 			  dd_mm_yyyy_to_datetime($value_date),
 			  $desc,
 			  $ref,
-			  $debit,
-			  $credit,
-			  $balance);
+			  sanitize_number($debit),
+			  sanitize_number($credit),
+			  sanitize_number($balance));
     return \%txn;
   } else {
     return undef;

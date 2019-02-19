@@ -4,16 +4,16 @@ This project is a collection of tools to keep track of my personal finances.
 ** Usage samples
 *** Sqlite database archiving
 #+BEGIN_SRC sh :results output :exports both
-  tmp=$(mktemp)
+  tmp=$(mktemp -u)
   perl -Ilib scripts/db_create.pl resources/sample_xls.dat $tmp
-  sqlite3 $tmp '.mode column' '.headers on' 'select * from txns'
+  sqlite3 $tmp -column -header 'select * from txns'
   rm $tmp
 #+END_SRC
 
 #+RESULTS:
 : txn_date             value_date           description                          ref_no                     debit       credit      balance   
 : -------------------  -------------------  -----------------------------------  -------------------------  ----------  ----------  ----------
-: 2018-10-01T00:00:00  2018-10-01T00:00:00  A Sample Description of Transaction  A Sample Reference Number  1           1           1         
+: 2018-10-01T00:00:00  2018-10-01T00:00:00  A Sample Description of Transaction  A Sample Reference Number  1.0         1.0         1.0       
 
 ** External dependencies
 - ledger3.
