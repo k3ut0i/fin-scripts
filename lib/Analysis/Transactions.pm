@@ -11,7 +11,7 @@ sub print_txns{
   my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", "", "");
 
   my $select_stmt = $dbh->prepare
-    (qq{SELECT * FROM txns WHERE txn_date BETWEEN ? AND ?});
+    (qq{SELECT * FROM sbi_txns WHERE txn_date BETWEEN ? AND ?});
 
   $select_stmt->execute($start_date, $end_date);
 
@@ -24,7 +24,7 @@ sub verify_txns{
   my ($start_date, $end_date, $dbfile) = @_;
   my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", "", "");
   my $stmt = $dbh->prepare
-    (qq{SELECT * FROM txns WHERE txn_date BETWEEN ? AND ?});
+    (qq{SELECT * FROM sbi_txns WHERE txn_date BETWEEN ? AND ?});
   $stmt->execute($start_date, $end_date);
   my $balance = $stmt->fetchrow_hashref->{'balance'};
   while (my $row = $stmt->fetchrow_hashref) {

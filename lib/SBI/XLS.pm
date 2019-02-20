@@ -9,7 +9,8 @@ use DateTime;
 use DateTime::Format::Strptime;
 use List::Util qw(all);
 use JSON;
-use File::Slurp qw(read_file);
+use File::Slurp qw(read_file write_file);
+use Fcntl qw(SEEK_SET);
 
 use constant TXN_HEADER => ("Txn Date", "Value Date", "Description",
 			    "Ref No./Cheque No.", "Debit", "Credit", "Balance");
@@ -27,11 +28,10 @@ sub trim{
   $str =~ s/^\s+|\s+$//g;
   return $str;
 }
+my $strp = DateTime::Format::Strptime->new(pattern => '%d %b %Y',
+					   on_error => 'croak');
 
-# TODO: Replace this with datetime formatters for strptime.
 sub dd_mm_yyyy_to_datetime{
-  my $strp = DateTime::Format::Strptime->new(pattern => '%d %b %Y',
-					     on_error => 'croak');
   $strp->parse_datetime($_[0]);
 }
 
@@ -62,7 +62,12 @@ sub slurp_address{
   }
   return $address;
 }
-sub burp_address{burp_generic($_[0])}
+
+sub burp_address{
+  my $add_str = shift;
+  my @fields = split(/, /, $add_str);
+  return \@fields;
+}
 
 sub slurp_date{
   my $date_string = slurp_generic $_[0], (INFO_HEADER)[2];
@@ -70,8 +75,9 @@ sub slurp_date{
 }
 sub burp_date{
   my $date_obj = shift;
-  return $date_obj->stringify();
+  return $strp->format_datetime($date_obj);
 }
+
 sub slurp_account_number{
   my $acc_string = slurp_generic $_[0], (INFO_HEADER)[3];
   if ( $acc_string =~ /_*(\d+)/) {
@@ -150,13 +156,13 @@ sub slurp_start_date{
   my $date_string = slurp_generic $_[0], (INFO_HEADER)[14];
   dd_mm_yyyy_to_datetime($date_string);
 }
-sub burp_start_date{$_[0]->stringify()};
+sub burp_start_date{burp_date $_[0]}
 
 sub slurp_end_date{
   my $date_string = slurp_generic $_[0], (INFO_HEADER)[15];
   dd_mm_yyyy_to_datetime($date_string);
 }
-sub burp_end_date{$_[0]->stringify()};
+sub burp_end_date{burp_date $_[0]}
 
 # Check if transaction header parses correctly
 sub slurp_txn_header{
@@ -189,7 +195,7 @@ sub slurp_txn_field{
     my ($txn_date, $value_date, $desc, $ref, $debit, $credit, $balance)
       = @fields;
     my %txn;
-    # TODO: Any sanitization to be done on reference nos. and descriptions ??
+
     @txn{TXN_HEADER()} = (dd_mm_yyyy_to_datetime($txn_date),
 			  dd_mm_yyyy_to_datetime($value_date),
 			  $desc,
@@ -208,14 +214,14 @@ sub sanitize_txn_fields{}
 # For each field we have a parser(slurp) and printer(burp)
 my %handlers =
   (
-   'Name' => [\&slurp_account_name, \&burp_account_name],
+   'Account Name' => [\&slurp_account_name, \&burp_account_name],
    'Address' => [\&slurp_address, \&burp_address],
    'Date' => [\&slurp_date, \&burp_date],
    'Account Number' => [\&slurp_account_number, \&burp_account_number],
    'Account Description' => [\&slurp_account_description, \&burp_account_description],
    'Branch' => [\&slurp_branch, \&burp_branch],
    'Drawing Power' => [\&slurp_drawing_power, \&burp_drawing_power],
-   'Interest Rate' => [\&slurp_interest_rate, \&burp_interest_rate],
+   'Interest Rate(% p.a.)' => [\&slurp_interest_rate, \&burp_interest_rate],
    'MOD Balance' => [\&slurp_mod_balance, \&burp_mod_balance],
    'CIF No.' => [\&slurp_cif_no, \&burp_cif_no],
    'IFS Code' => [\&slurp_ifs_code, \&burp_ifs_code],
@@ -228,17 +234,19 @@ my %handlers =
 
 sub get_personal_info{
   my $xls = shift;
+  seek $xls, 0, SEEK_SET
+    or die "Can't seek to beginning of XLS file.";
   my $personal_info;
   $personal_info =
     {
-     'Name' => slurp_account_name($xls),
+     'Account Name' => slurp_account_name($xls),
      'Address' => slurp_address($xls),
      'Date' => slurp_date($xls),
      'Account Number' => slurp_account_number($xls),
      'Account Description' => slurp_account_description($xls),
      'Branch' => slurp_branch($xls),
      'Drawing Power' => slurp_drawing_power($xls),
-     'Interest Rate' => slurp_interest_rate($xls),
+     'Interest Rate(% p.a.)' => slurp_interest_rate($xls),
      'MOD Balance' => slurp_mod_balance($xls),
      'CIF No.' => slurp_cif_no($xls),
      'IFS Code' => slurp_ifs_code($xls),
@@ -251,8 +259,17 @@ sub get_personal_info{
   return $personal_info;
 }
 
+sub DateTime::TO_JSON{
+  my $dt_obj = shift;
+  return $strp->format($dt_obj);
+}
 # Write personal info to JSON file
-sub write_personal_info{};
+sub write_personal_info{
+  my ($xls_fh, $output_file) = @_;
+  my $pinfo = get_personal_info($xls_fh);
+  my %json_info = map {$_ => $handlers{$_}[1]($pinfo->{$_})}INFO_HEADER;
+  write_file($output_file, encode_json \%json_info);
+};
 
 ## Tests if the given data file is the one we want.
 sub validate_input{
@@ -268,8 +285,9 @@ sub validate_input{
   all {
     my $equality = 0;
     if (ref $xls_info->{$_} eq 'DateTime') {
-      $equality = DateTime->compare($xls_info->{$_},
-				    dd_mm_yyyy_to_datetime($saved_json_info->{$_}));
+      my $dt_ord = DateTime->compare($xls_info->{$_},
+				     dd_mm_yyyy_to_datetime($saved_json_info->{$_}));
+      $equality = $dt_ord == 0;
     }elsif ($_ eq 'Address') {
       $equality = $xls_info->{$_} eq join(', ', @{$saved_json_info->{$_}});
     } elsif ($_ eq 'IFS Code') {

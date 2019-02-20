@@ -5,10 +5,16 @@ Rather than using custom script to handle xlsx files, I am using libreoffice.
 #+BEGIN_SRC sh
   libreoffice --headless --convert-to csv filename.xlsx
 #+END_SRC
+SBI XLS files are just plain text tab separated fields, so I'm not using libreoffice in my workflow.
 
 ** DONE DateTime
    CLOSED: [2019-02-15 Fri 16:20]
    [2019-02-15 Fri]
    I assumed datetime will be in dd/mm/yyyy format. but the months are English short forms. Jan, Feb, ... etc. DateTime should have a format handler that accepts this format. Rewriting my own function will be cumbersome to maintain. In CLDR patterns there are MMM, LLL an abbreviated (and stand alone) form for month. I should look into that and replace the working of dd_mm_yyyy_to_datetime function using a DateTime::Formatter.
+
    [2019-02-15 Fri] Hmm, What i want is DateTime::Format::Strptime package.
+
    [2019-02-15 Fri] Used %d %b %Y in strptime format to parse Month abbrevs.
+
+** JSON Files
+[2019-02-20 Wed] Personal information is re-written for validation purposes to a JSON file when a database is initialized. *burp_* series of functions are for serializing personal data to JSON file.

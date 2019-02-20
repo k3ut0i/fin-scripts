@@ -17,15 +17,16 @@ sub create_db{
   die "file already exists: $dbfile" if (-e $dbfile);
   my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", "", "");
   my $schema = join(', ', SCHEMA);
-  $dbh->do("create table txns ($schema)");
+  $dbh->do("create table sbi_txns ($schema)");
   return $dbh;
 }
 
+# TODO: How to gracefully handle multiple entries?
 sub update_db{
   my $txn = shift;
   my $dbh = shift;
   my $update_stmt =
-    $dbh->prepare("insert into txns values (? , ? , ? , ? , ? , ? , ?)");
+    $dbh->prepare("insert into sbi_txns values (? , ? , ? , ? , ? , ? , ?)");
   $update_stmt->execute(@{$txn}{SBI::XLS::TXN_HEADER});
 }
 

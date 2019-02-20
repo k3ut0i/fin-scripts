@@ -6,7 +6,7 @@ This project is a collection of tools to keep track of my personal finances.
 #+BEGIN_SRC sh :results output :exports both
   tmp=$(mktemp -u)
   perl -Ilib scripts/db_create.pl resources/sample_xls.dat $tmp
-  sqlite3 $tmp -column -header 'select * from txns'
+  sqlite3 $tmp -column -header 'select * from sbi_txns'
   rm $tmp
 #+END_SRC
 
