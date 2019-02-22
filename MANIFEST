@@ -1,10 +1,17 @@
-lib/sbi_xls.pm
+docs/impl.org
+lib/Analysis/Transactions.pm
+lib/SBI/Store.pm
+lib/SBI/XLS.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 readme.org
 resources/sample_info.dat
 resources/sample_info.json
 resources/sample_xls.dat
+scripts/db_create.pl
+scripts/dump_db.pl
+scripts/dump_sanitized_transactions.pl
 t/00parsing.t
 t/01validation.t
 t/02reporting.t

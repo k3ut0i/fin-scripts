@@ -12,6 +12,8 @@ use JSON;
 use File::Slurp qw(read_file write_file);
 use Fcntl qw(SEEK_SET);
 
+our $VERSION = 0.1;
+
 use constant TXN_HEADER => ("Txn Date", "Value Date", "Description",
 			    "Ref No./Cheque No.", "Debit", "Credit", "Balance");
 our $txn_header = join "\t", TXN_HEADER;
@@ -312,11 +314,11 @@ sub validate_input{
 __END__
 =head1 NAME
 
-sbi_xls - Process, analyze and report XLS transaction logs from State Bank of India(SBI)
+SBI::XLS - Process XLS transaction logs from State Bank of India(SBI) statements.
 
 =head1 SYNOPSIS
 
- use sbi_xls;
+ use SBI::XLS;
 
  # make sure the transaction data file matches the current account.
  validate_input("NNNNNN_xls.dat", "jane_doe.json");
@@ -332,5 +334,19 @@ sbi_xls - Process, analyze and report XLS transaction logs from State Bank of In
 This module helps process XLS data files provided by SBI that logs bank transactions.
 Currently the only responsibility of this module is to update the transaction logs to
 another persistant database. 
+
+=head1 AUTHOR
+
+Keutoi (k3tu0isui@gmail.com)
+
+=head1 BUGS
+
+Any activity involving parsing a text which is not standardized has Bugs.
+I've tried extensive testing, but getting all the bugs not possible.
+
+=head1 LICENCE
+
+This project is under 0BSD license. Look at the LICENSE file in the
+distribution.
 
 =cut
