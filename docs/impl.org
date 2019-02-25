@@ -18,3 +18,6 @@ SBI XLS files are just plain text tab separated fields, so I'm not using libreof
 
 ** JSON Files
 [2019-02-20 Wed] Personal information is re-written for validation purposes to a JSON file when a database is initialized. *burp_* series of functions are for serializing personal data to JSON file.
+
+** GnuCash Bridge
+Gnucash requires more parameters to import transactions. Account and Transfer Account names. A More personal description of the transfer also might be better in the long run. I need a simple cli editing to add this data to each construction. Some thing with readline should be enough for my editing purposes.

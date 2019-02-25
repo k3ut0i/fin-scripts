@@ -32,9 +32,11 @@ sub trim{
 }
 my $strp = DateTime::Format::Strptime->new(pattern => '%d %b %Y',
 					   on_error => 'croak');
-
+my $date_blurp = DateTime::Format::Strptime->new(pattern => '%Y-%m-%d',
+						on_error=>'croak');
 sub dd_mm_yyyy_to_datetime{
-  $strp->parse_datetime($_[0]);
+  my $dt = $strp->parse_datetime($_[0]);
+  $dt->set_formatter($date_blurp);
 }
 
 sub slurp_generic{
